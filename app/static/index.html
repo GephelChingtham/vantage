@@ -1,1 +1,278 @@
-[paste entire HTML code here]
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Vantage</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0d0d0d;
+            position: relative;
+            overflow-x: hidden;
+            min-height: 100vh;
+            padding: 60px 20px;
+            color: #fff;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 50%, rgba(212,152,83,0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(179,83,212,0.08) 0%, transparent 50%);
+            z-index: 1;
+            pointer-events: none;
+            animation: shift 8s ease-in-out infinite;
+        }
+
+        @keyframes shift {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(20px, -30px); }
+        }
+
+        .container { 
+            max-width: 1100px; 
+            margin: 0 auto; 
+            position: relative;
+            z-index: 2;
+        }
+
+        h1 { 
+            font-size: 52px; 
+            font-weight: 800; 
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #d49853 0%, #b353d4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle { 
+            color: #888; 
+            margin-bottom: 50px; 
+            font-size: 14px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .mosaic-tile {
+            background: rgba(20,20,20,0.8);
+            border: 1px solid rgba(212,152,83,0.3);
+            border-radius: 8px;
+            padding: 20px;
+            backdrop-filter: blur(8px);
+            transition: all 0.3s ease;
+        }
+
+        .mosaic-tile:hover {
+            background: rgba(212,152,83,0.05);
+            border-color: rgba(212,152,83,0.6);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(212,152,83,0.15);
+        }
+
+        .upload-box {
+            background: rgba(20,20,20,0.6);
+            border: 2px dashed rgba(212,152,83,0.4);
+            border-radius: 12px;
+            padding: 80px 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            max-width: 550px;
+            margin: 0 auto 50px;
+        }
+
+        .upload-box:hover {
+            border-color: rgba(212,152,83,0.8);
+            background: rgba(212,152,83,0.03);
+        }
+
+        input[type="file"] { display: none; }
+
+        .results { display: none; }
+        .loading { display: none; text-align: center; margin: 80px 0; }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .metric-value { 
+            font-size: 32px; 
+            font-weight: 700; 
+            color: #d49853;
+            margin-top: 8px;
+        }
+
+        .metric-label {
+            font-size: 11px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .flag {
+            background: rgba(212,152,83,0.15);
+            color: #d49853;
+            padding: 6px 14px;
+            border-radius: 16px;
+            font-size: 12px;
+            display: inline-block;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            border: 1px solid rgba(212,152,83,0.3);
+        }
+
+        .directive {
+            font-size: 14px;
+            color: #bbb;
+            line-height: 1.7;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px 24px;
+            background: rgba(212,152,83,0.15);
+            color: #d49853;
+            border: 1px solid rgba(212,152,83,0.4);
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            background: rgba(212,152,83,0.25);
+            border-color: rgba(212,152,83,0.7);
+        }
+
+        @keyframes spin { 
+            from { transform: rotate(0deg); } 
+            to { transform: rotate(360deg); } 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>VANTAGE</h1>
+        <p class="subtitle">Communication Intelligence</p>
+
+        <div class="upload-box" id="uploadBox" onclick="document.getElementById('fileInput').click()">
+            <div style="font-size: 56px; margin-bottom: 20px;">⚡</div>
+            <p style="font-size: 16px; color: #fff; margin: 0 0 8px; font-weight: 600;">Upload Chat Export</p>
+            <p style="font-size: 13px; color: #666; margin: 0;">WhatsApp .txt or Discord .json</p>
+            <input type="file" id="fileInput" accept=".txt,.json" />
+        </div>
+
+        <div class="loading" id="loading">
+            <div style="font-size: 48px; margin-bottom: 20px; animation: spin 2s linear infinite;">⚙️</div>
+            <p style="font-size: 16px; color: #fff; margin: 0 0 8px;">Analyzing...</p>
+            <p style="font-size: 12px; color: #666; margin: 0;">Few seconds</p>
+        </div>
+
+        <div class="results" id="results">
+            <div class="metric-grid">
+                <div class="mosaic-tile">
+                    <div class="metric-label">Directness</div>
+                    <div class="metric-value"><span id="directness">-</span></div>
+                    <div style="font-size: 10px; color: #666; margin-top: 6px;" id="confidence">-</div>
+                </div>
+                <div class="mosaic-tile">
+                    <div class="metric-label">Person A</div>
+                    <div class="metric-value"><span id="effortA">-</span>%</div>
+                </div>
+                <div class="mosaic-tile">
+                    <div class="metric-label">Person B</div>
+                    <div class="metric-value"><span id="effortB">-</span>%</div>
+                </div>
+                <div class="mosaic-tile">
+                    <div class="metric-label">Risk</div>
+                    <div class="metric-value" style="color: #d49853;" id="risk">-</div>
+                </div>
+            </div>
+
+            <div class="mosaic-tile" style="margin-bottom: 20px;">
+                <div class="metric-label">Red Flags</div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px;" id="flags"></div>
+            </div>
+
+            <div class="mosaic-tile" style="margin-bottom: 24px;">
+                <div class="metric-label">Boundary Directive</div>
+                <p class="directive" id="directive" style="margin-top: 12px;">-</p>
+            </div>
+
+            <button onclick="location.reload()">New Analysis</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('fileInput').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            document.getElementById('uploadBox').style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+
+            try {
+                const res = await fetch('/api/v1/analyze', { method: 'POST', body: formData });
+                if (!res.ok) throw new Error('Upload failed');
+                const data = await res.json();
+                const jobId = data.job_id;
+
+                let attempts = 0;
+                while (attempts < 30) {
+                    await new Promise(r => setTimeout(r, 1000));
+                    const jobRes = await fetch('/api/v1/job/' + jobId);
+                    const jobData = await jobRes.json();
+
+                    if (jobData.status === 'complete') {
+                        displayResults(jobData);
+                        document.getElementById('loading').style.display = 'none';
+                        document.getElementById('results').style.display = 'block';
+                        return;
+                    }
+                    attempts++;
+                }
+
+                alert('Analysis timeout');
+                location.reload();
+            } catch (err) {
+                alert('Error: ' + err.message);
+                location.reload();
+            }
+        });
+
+        function displayResults(data) {
+            document.getElementById('directness').textContent = data.directness_score.toFixed(1);
+            document.getElementById('confidence').textContent = 'Confidence: ' + (data.directness_confidence * 100).toFixed(0) + '%';
+            document.getElementById('effortA').textContent = (data.effort_matrix.initiator_person_a * 100).toFixed(0);
+            document.getElementById('effortB').textContent = (data.effort_matrix.initiator_person_b * 100).toFixed(0);
+            document.getElementById('risk').textContent = data.red_flags.situationship_risk_index;
+
+            const flagsContainer = document.getElementById('flags');
+            flagsContainer.innerHTML = '';
+            data.red_flags.flags_detected.forEach(flag => {
+                const span = document.createElement('span');
+                span.className = 'flag';
+                span.textContent = flag;
+                flagsContainer.appendChild(span);
+            });
+
+            document.getElementById('directive').textContent = data.post_mortem.boundary_directive;
+        }
+    </script>
+</body>
+</html>
