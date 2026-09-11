@@ -140,3 +140,7 @@ async def delete_user(user_id: str, db: Session = Depends(get_db)):
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
+from fastapi.staticfiles import StaticFiles
+
+app.mount("/", StaticFiles(directory="app/static", html=True), name="static")
