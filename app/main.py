@@ -144,3 +144,39 @@ if __name__ == "__main__":
 from fastapi.staticfiles import StaticFiles
 
 app.mount("/", StaticFiles(directory="app/static", html=True), name="static")
+code app/main.py
+@app.post("/api/v1/analyze")
+async def analyze_file(file: UploadFile = File(...)):
+    import base64
+    
+    contents = await file.read()
+    file_ext = file.filename.split('.')[-1].lower()
+    
+    job_id = str(uuid.uuid4())
+    
+    # Handle images
+    if file_ext in ['png', 'jpg', 'jpeg']:
+        base64_image = base64.b64encode(contents).decode()
+        # Store image data
+        jobs[job_id] = {
+            "status": "processing",
+            "file_type": "image",
+            "data": base64_image,
+            "filename": file.filename
+        }
+    else:
+        # Handle text files
+        text = contents.decode('utf-8')
+        messages = parse_chat(text, file_ext)
+        directness = calculate_directness(messages)
+        effort = calculate_effort(messages)
+        
+        jobs[job_id] = {
+            "status": "processing",
+            "directness_score": directness,
+            "directness_confidence": 0.85,
+            "effort_matrix": effort
+        }
+    
+    asyncio.create_task(process_job(job_id))
+    return {"job_id": job_id, "status": "accepted"}
