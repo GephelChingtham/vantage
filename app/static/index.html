@@ -168,9 +168,9 @@
 
         <div class="upload-box" id="uploadBox" onclick="document.getElementById('fileInput').click()">
             <div style="font-size: 56px; margin-bottom: 20px;">⚡</div>
-            <p style="font-size: 16px; color: #fff; margin: 0 0 8px; font-weight: 600;">Upload Chat Export</p>
-            <p style="font-size: 13px; color: #666; margin: 0;">WhatsApp .txt or Discord .json</p>
-            <input type="file" id="fileInput" accept=".txt,.json" />
+            <p style="font-size: 16px; color: #fff; margin: 0 0 8px; font-weight: 600;">Upload Chat Export or Screenshots</p>
+            <p style="font-size: 13px; color: #666; margin: 0;">WhatsApp .txt, Discord .json, or chat screenshots (PNG/JPG)</p>
+            <input type="file" id="fileInput" accept=".txt,.json,.png,.jpg,.jpeg" multiple />
         </div>
 
         <div class="loading" id="loading">
@@ -216,11 +216,13 @@
 
     <script>
         document.getElementById('fileInput').addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
+            const files = e.target.files;
+            if (!files.length) return;
 
             const formData = new FormData();
-            formData.append('file', file);
+            for (let file of files) {
+                formData.append('file', file);
+            }
 
             document.getElementById('uploadBox').style.display = 'none';
             document.getElementById('loading').style.display = 'block';
